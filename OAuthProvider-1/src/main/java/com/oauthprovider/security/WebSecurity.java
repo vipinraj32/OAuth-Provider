@@ -19,6 +19,7 @@ public class WebSecurity {
 
 	
 	private final JwtAuthFilter jwtAuthFilter;
+	private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	  private final HandlerExceptionResolver handlerExceptionResolver;
 	  
 	 
@@ -32,7 +33,14 @@ public class WebSecurity {
 	                        .requestMatchers("/user/login","/user/signup").permitAll()
 	                        .anyRequest().authenticated()
 	                )
-	                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+	                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+	                .oauth2Login(oAuth2 -> oAuth2
+	                        .failureHandler((request, response, exception) -> {
+	                            log.error("OAuth2 error: {}", exception.getMessage());
+	                            handlerExceptionResolver.resolveException(request, response, null, exception);
+	                        })
+	                        .successHandler(oAuth2SuccessHandler)
+	                        ); 
 
 //	                .formLogin();
 	        return httpSecurity.build();
