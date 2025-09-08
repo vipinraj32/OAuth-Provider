@@ -16,6 +16,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.oauthprovider.entity.Role;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -36,6 +38,9 @@ public class User implements UserDetails{
 	private String email;
 	private String password;
 	private String name;
+	private String providerId;
+    @Enumerated(EnumType.STRING)
+	private AuthProviderType providerType;
 //	@JsonIgnore
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(
@@ -105,6 +110,22 @@ public class User implements UserDetails{
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public String getProviderId() {
+		return providerId;
+	}
+
+	public void setProviderId(String providerId) {
+		this.providerId = providerId;
+	}
+
+	public AuthProviderType getProviderType() {
+		return providerType;
+	}
+
+	public void setProviderType(AuthProviderType providerType) {
+		this.providerType = providerType;
 	}
 	
 
