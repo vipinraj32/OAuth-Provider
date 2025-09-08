@@ -3,6 +3,7 @@ package com.oauthprovider.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -79,13 +80,13 @@ public class AuthService {
                 .email(signupRequestDto.getEmail())
                 .providerId(providerId)
                 .providerType(authProviderType)
-//                .roles() // Role.PATIENT
+//                .roles(Sety.findById(2)) // Role.PATIENT
                 .build();
 
         if(authProviderType == AuthProviderType.EMAIL) {
             user.setPassword(passwordEncoder.encode(signupRequestDto.getPassword()));
         }
-        user.addRole(role);
+//        user.addRole(role);
         user = userRepository.save(user);
 
        return user;
