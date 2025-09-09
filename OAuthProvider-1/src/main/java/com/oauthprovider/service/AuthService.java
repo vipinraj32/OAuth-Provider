@@ -71,16 +71,17 @@ public class AuthService {
     	return userRepository.findAll();
     }
     
-    public User signUpInternal(Request signupRequestDto, AuthProviderType authProviderType, String providerId) {
+    public User signUpInternal(Request signupRequestDto, AuthProviderType authProviderType,String name, String providerId) {
         User user = userRepository.findById(signupRequestDto.getEmail()).orElse(null);
 
         if(user != null) throw new IllegalArgumentException("User already exists");
          Role role=roleRepository.findById(2).orElse(null);
         user = User.builder()
                 .email(signupRequestDto.getEmail())
+                .name(name)
                 .providerId(providerId)
                 .providerType(authProviderType)
-//                .roles(Sety.findById(2)) // Role.PATIENT
+                .roles(Set.of(role)) // Role.PATIENT
                 .build();
 
         if(authProviderType == AuthProviderType.EMAIL) {
@@ -98,7 +99,7 @@ public class AuthService {
     			.email(signupRequestDto.getEmail())
     			.password(signupRequestDto.getPassword())
     			.build();
-        User user = signUpInternal(request, AuthProviderType.EMAIL, null);
+        User user = signUpInternal(request, AuthProviderType.EMAIL,signupRequestDto.getName(), null);
         return user;
     }
     
@@ -110,13 +111,14 @@ public class AuthService {
         User user = userRepository.findByProviderIdAndProviderType(providerId, providerType).orElse(null);
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
+        log.info(name);
 
         User emailUser = userRepository.findByEmail(email).orElse(null);
 
         if(user == null && emailUser == null) {
             // signup flow:
-            String username = authUtil.determineUsernameFromOAuth2User(oAuth2User, registrationId, providerId);
-            user = signUpInternal(new Request(username, null), providerType, providerId);
+            String useremail = authUtil.determineUsernameFromOAuth2User(oAuth2User, registrationId, providerId);
+            user = signUpInternal(new Request(useremail, null), providerType,name, providerId);
         } else if(user != null) {
             if(email != null && !email.isBlank() && !email.equals(user.getUsername())) {
                 user.setEmail(email);
@@ -126,7 +128,7 @@ public class AuthService {
             throw new BadCredentialsException("This email is already registered with provider "+emailUser.getProviderType());
         }
 
-        Response loginResponseDto = new Response(authUtil.generateAccessToken(user), user.getEmail(), user.getRoles().toString(),user.getUsername());
+        Response loginResponseDto = new Response(authUtil.generateAccessToken(user), user.getEmail(), user.getAuthorities().toString(),user.getName());
         return ResponseEntity.ok(loginResponseDto);
     }
 }
