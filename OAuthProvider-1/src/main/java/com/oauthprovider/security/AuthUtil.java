@@ -53,6 +53,7 @@ public class AuthUtil {
             case "google" -> AuthProviderType.GOOGLE;
             case "twitter" -> AuthProviderType.TWITTER;
             case "facebook" -> AuthProviderType.FACEBOOK;
+            case "instagram"->AuthProviderType.INSTAGRAM;
             default -> throw new IllegalArgumentException("Unsupported OAuth2 provider: " + registrationId);
         };
     }
