@@ -39,7 +39,7 @@ public class AuthController {
 		response.put("status",HttpStatus.CREATED.value());
 	    return ResponseEntity.ok(response);	
 	}
-//	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/showAll")
 	public ResponseEntity<List<User>>show(){
 		
